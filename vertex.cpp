@@ -20,3 +20,20 @@ template <typename Te> struct Edge { // 边对象(并未完全封装)
   Edge( Te const & d, int w ) : // 构造新边
     data(d), weight(w), status(UNDETERMINED) {}
 };
+
+void DFS () {
+  for (int u = firstNbr(v); -1 < u; u = nextNbr(v, u)) // 枚举所有邻居u
+    switch(status(u)) { // 并视基状态分别处理
+    case UNDISCOVERED: // u 尚未发现, 意味着支撑树可在此拓展
+      status(v, u) = TREE;
+      parent(u) = v;
+      DFS(u, clock); // 递归
+      break;
+    case DISCOVERED: // u 已被发现但尚未访问完毕，应属被后代指向的祖先
+      status (v, u) = BACKWARD;
+      break;
+    default: // u 已访问完毕 ( VISITED, 有向图 ), 则视承袭关系分为前向边或跨边
+      status (v, u) = dTime(v) < dTime(u) ? FORWARD : CROSS;
+      break;
+    }
+}
